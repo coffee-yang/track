@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
       url: request.url,
       method: request.method,
       headers: Object.fromEntries(request.headers.entries()),
+      query: Object.fromEntries(searchParams.entries()),
     };
 
     console.log('Raw request:', rawRequest);
@@ -61,9 +62,12 @@ export async function GET(request: NextRequest) {
     if (!callbackResponse.session) {
       throw new Error('No session data received from Shopify');
     }
+
+    // 存储会话数据
+    await shopify.config.sessionStorage.storeSession(callbackResponse.session);
     
-    // 重定向到应用主页
-    const redirectUrl = new URL('/', request.url);
+    // 重定向到仪表板
+    const redirectUrl = new URL('/dashboard', request.url);
     redirectUrl.searchParams.set('shop', shop);
     console.log('Redirecting to:', redirectUrl.toString());
 
