@@ -47,7 +47,14 @@ export default function DashboardContent() {
         // 获取订单数据
         const ordersResponse = await fetch(`/api/orders?shop=${encodeURIComponent(shop)}`);
         if (!ordersResponse.ok) {
-          throw new Error('Failed to fetch orders');
+          const errorData = await ordersResponse.json();
+          // 如果是认证错误，重定向到认证页面
+          if (ordersResponse.status === 401) {
+            console.log('Authentication required, redirecting to auth...');
+            router.push(`/api/auth?shop=${encodeURIComponent(shop)}`);
+            return;
+          }
+          throw new Error(errorData.error || 'Failed to fetch orders');
         }
         const ordersData = await ordersResponse.json();
         setOrders(ordersData.orders || []);
@@ -55,7 +62,13 @@ export default function DashboardContent() {
         // 获取客户数据
         const customersResponse = await fetch(`/api/customers?shop=${encodeURIComponent(shop)}`);
         if (!customersResponse.ok) {
-          throw new Error('Failed to fetch customers');
+          const errorData = await customersResponse.json();
+          if (customersResponse.status === 401) {
+            console.log('Authentication required, redirecting to auth...');
+            router.push(`/api/auth?shop=${encodeURIComponent(shop)}`);
+            return;
+          }
+          throw new Error(errorData.error || 'Failed to fetch customers');
         }
         const customersData = await customersResponse.json();
         setCustomers(customersData.customers || []);

@@ -38,7 +38,15 @@ if (missingEnvVars.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
 }
 
-// 存储访问令牌的简单对象
+// 使用 localStorage 在客户端存储会话
+const getLocalStorage = () => {
+  if (typeof window !== 'undefined') {
+    return window.localStorage;
+  }
+  return null;
+};
+
+// 存储访问令牌的简单对象（用于服务器端）
 const tokenStore: { [key: string]: string } = {};
 
 // 初始化 Shopify API
@@ -66,12 +74,37 @@ export const shopify = shopifyApi({
         scope: session.scope,
         isOnline: session.isOnline,
       });
+      
+      // 存储在服务器端内存中
       tokenStore[session.shop] = session.accessToken;
+      
+      // 如果在客户端，也存储在 localStorage 中
+      const storage = getLocalStorage();
+      if (storage) {
+        storage.setItem(`shopify_token_${session.shop}`, session.accessToken);
+      }
     },
     async loadSession(id: string) {
       console.log('Loading session:', id);
-      const token = tokenStore[id];
-      if (!token) return undefined;
+      
+      // 首先尝试从服务器端内存中获取
+      let token = tokenStore[id];
+      
+      // 如果在客户端且没有在服务器端找到令牌，尝试从 localStorage 获取
+      if (!token) {
+        const storage = getLocalStorage();
+        if (storage) {
+          const localToken = storage.getItem(`shopify_token_${id}`);
+          if (localToken) {
+            token = localToken;
+          }
+        }
+      }
+      
+      if (!token) {
+        console.log('No session found for shop:', id);
+        return undefined;
+      }
       
       const session = new Session({
         id,
@@ -86,6 +119,12 @@ export const shopify = shopifyApi({
     async deleteSession(id: string) {
       console.log('Deleting session:', id);
       delete tokenStore[id];
+      
+      // 如果在客户端，也从 localStorage 中删除
+      const storage = getLocalStorage();
+      if (storage) {
+        storage.removeItem(`shopify_token_${id}`);
+      }
     },
   },
 });
@@ -99,10 +138,31 @@ console.log('Shopify API Configuration:', {
 
 // 获取商店访问令牌
 export async function getShopAccessToken(shop: string): Promise<string | null> {
-  return tokenStore[shop] || null;
+  // 首先尝试从服务器端内存中获取
+  let token = tokenStore[shop];
+  
+  // 如果在客户端且没有在服务器端找到令牌，尝试从 localStorage 获取
+  if (!token) {
+    const storage = getLocalStorage();
+    if (storage) {
+      const localToken = storage.getItem(`shopify_token_${shop}`);
+      if (localToken) {
+        token = localToken;
+      }
+    }
+  }
+  
+  return token || null;
 }
 
 // 存储商店访问令牌
 export async function storeShopAccessToken(shop: string, accessToken: string): Promise<void> {
+  // 存储在服务器端内存中
   tokenStore[shop] = accessToken;
+  
+  // 如果在客户端，也存储在 localStorage 中
+  const storage = getLocalStorage();
+  if (storage) {
+    storage.setItem(`shopify_token_${shop}`, accessToken);
+  }
 } 
