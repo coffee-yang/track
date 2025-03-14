@@ -2,10 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
+    SHOPIFY_API_KEY: '96e3e63379c5091c564fd89aa9709515',
+    NEXT_PUBLIC_SHOPIFY_API_KEY: '96e3e63379c5091c564fd89aa9709515',
     SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
-    SHOPIFY_APP_SCOPES: process.env.SHOPIFY_APP_SCOPES || 'read_orders,read_customers',
-    HOST: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.HOST || 'http://localhost:3000',
+    NEXT_PUBLIC_SHOPIFY_APP_SCOPES: process.env.NEXT_PUBLIC_SHOPIFY_APP_SCOPES || process.env.SHOPIFY_APP_SCOPES || 'read_orders,read_customers',
+    NEXT_PUBLIC_HOST: process.env.NEXT_PUBLIC_HOST || process.env.HOST || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
   },
   async headers() {
     return [
