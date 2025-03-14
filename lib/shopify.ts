@@ -1,14 +1,11 @@
 import { shopifyApi, LATEST_API_VERSION, LogSeverity } from '@shopify/shopify-api';
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
 // 检查必要的环境变量
 const requiredEnvVars = {
-  SHOPIFY_API_KEY: publicRuntimeConfig.SHOPIFY_API_KEY,
-  SHOPIFY_API_SECRET: serverRuntimeConfig.SHOPIFY_API_SECRET,
-  SHOPIFY_APP_SCOPES: publicRuntimeConfig.SHOPIFY_APP_SCOPES,
-  HOST: publicRuntimeConfig.HOST,
+  SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
+  SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
+  SHOPIFY_APP_SCOPES: process.env.SHOPIFY_APP_SCOPES || 'read_orders,read_customers',
+  HOST: process.env.HOST || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
 };
 
 // 检查缺失的环境变量
@@ -29,9 +26,7 @@ console.log('Environment Variables Status:', {
 
 if (missingEnvVars.length > 0) {
   console.error('Critical environment variables are missing:', missingEnvVars);
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
-  }
+  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
 }
 
 // 初始化 Shopify API
