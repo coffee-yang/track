@@ -5,7 +5,7 @@ const nextConfig = {
     SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
     SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
     SHOPIFY_APP_SCOPES: process.env.SHOPIFY_APP_SCOPES,
-    HOST: process.env.HOST,
+    HOST: process.env.HOST || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
   },
   async headers() {
     return [
@@ -21,6 +21,7 @@ const nextConfig = {
       },
     ];
   },
-};
+  optimizeFonts: true,
+}
 
 module.exports = nextConfig; 
