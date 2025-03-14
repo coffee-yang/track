@@ -43,6 +43,32 @@ export const shopify = shopifyApi({
     httpRequests: true,
     timestamps: true,
   },
+  isPrivateApp: false,
+  sessionStorage: {
+    async storeSession(session) {
+      console.log('Storing session:', {
+        shop: session.shop,
+        scope: session.scope,
+        isOnline: session.isOnline,
+      });
+      tokenStore[session.shop] = session.accessToken;
+    },
+    async loadSession(id) {
+      console.log('Loading session:', id);
+      const token = tokenStore[id];
+      if (!token) return undefined;
+      return {
+        shop: id,
+        accessToken: token,
+        scope: requiredEnvVars.SHOPIFY_APP_SCOPES,
+        isOnline: false,
+      };
+    },
+    async deleteSession(id) {
+      console.log('Deleting session:', id);
+      delete tokenStore[id];
+    },
+  },
 });
 
 console.log('Shopify API Configuration:', {

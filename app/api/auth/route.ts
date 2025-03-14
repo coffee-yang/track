@@ -6,6 +6,12 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const shop = url.searchParams.get('shop');
     
+    console.log('Auth request received:', {
+      url: request.url,
+      shop,
+      headers: Object.fromEntries(request.headers.entries()),
+    });
+    
     if (!shop) {
       return NextResponse.json({ error: 'Missing shop parameter' }, { status: 400 });
     }
@@ -19,12 +25,25 @@ export async function GET(request: Request) {
     const authUrl = await shopify.auth.begin({
       shop,
       callbackPath: '/api/auth/callback',
-      isOnline: false, // 使用离线访问模式
-      rawRequest: request
+      isOnline: false,
+      rawRequest: {
+        method: request.method,
+        url: request.url,
+        headers: Object.fromEntries(request.headers.entries()),
+        statusCode: 200,
+        statusMessage: 'OK',
+        socket: {
+          encrypted: url.protocol === 'https:',
+        },
+      } as unknown
     });
 
-    console.log('Starting OAuth flow for shop:', shop);
-    console.log('Redirecting to:', authUrl);
+    console.log('Starting OAuth flow:', {
+      shop,
+      authUrl,
+      callbackPath: '/api/auth/callback',
+      isOnline: false,
+    });
 
     return NextResponse.redirect(authUrl);
   } catch (error) {
