@@ -22,14 +22,20 @@ export default function LoginForm() {
         </p>
         <div className="space-y-4">
           <button
-            onClick={() => router.push('/api/auth?shop=' + encodeURIComponent(shopParam))}
+            onClick={() => router.push('/dashboard?shop=' + encodeURIComponent(shopParam))}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            View Dashboard
+          </button>
+          <button
+            onClick={() => router.push('/api/auth?shop=' + encodeURIComponent(shopParam))}
+            className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
           >
             Re-authenticate
           </button>
           <button
             onClick={() => router.push('/')}
-            className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+            className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors"
           >
             Switch Shop
           </button>
