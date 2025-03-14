@@ -1,26 +1,36 @@
-import { NextResponse } from 'next/server';
-import { shopify } from '@/lib/shopify';
-
-export async function GET(request: Request) {
-  try {
-    const url = new URL(request.url);
-    const shop = url.searchParams.get('shop');
-    
-    if (!shop) {
-      return NextResponse.json({ error: 'Missing shop parameter' }, { status: 400 });
-    }
-
-    // 开始 OAuth 流程
-    const authUrl = await shopify.auth.begin({
-      shop,
-      callbackPath: '/api/auth/callback',
-      isOnline: false,
-      rawRequest: request
-    });
-
-    return NextResponse.redirect(authUrl);
-  } catch (error) {
-    console.error('Auth error:', error);
-    return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });
-  }
-} 
+import { AdapterArgs } from '../../../runtime/http/types';
+export declare const SESSION_COOKIE_NAME = "shopify_app_session";
+export declare const STATE_COOKIE_NAME = "shopify_app_state";
+export interface AuthQuery {
+    [key: string]: string | undefined;
+    hmac?: string;
+    signature?: string;
+}
+export interface BeginParams extends AdapterArgs {
+    shop: string;
+    callbackPath: string;
+    isOnline: boolean;
+}
+export interface CallbackParams extends AdapterArgs {
+}
+export interface AccessTokenResponse {
+    access_token: string;
+    scope: string;
+}
+export interface OnlineAccessInfo {
+    expires_in: number;
+    associated_user_scope: string;
+    associated_user: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        email: string;
+        email_verified: boolean;
+        account_owner: boolean;
+        locale: string;
+        collaborator: boolean;
+    };
+}
+export interface OnlineAccessResponse extends AccessTokenResponse, OnlineAccessInfo {
+}
+//# sourceMappingURL=types.d.ts.map
