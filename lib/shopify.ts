@@ -1,4 +1,4 @@
-import { shopifyApi, LATEST_API_VERSION, LogSeverity } from '@shopify/shopify-api';
+import { shopifyApi, LATEST_API_VERSION, LogSeverity, Session } from '@shopify/shopify-api';
 import '@shopify/shopify-api/adapters/node';
 
 // 检查必要的环境变量
@@ -33,7 +33,7 @@ if (missingEnvVars.length > 0) {
 // 初始化 Shopify API
 export const shopify = shopifyApi({
   apiKey: requiredEnvVars.SHOPIFY_API_KEY,
-  apiSecretKey: requiredEnvVars.SHOPIFY_API_SECRET!,
+  apiSecretKey: requiredEnvVars.SHOPIFY_API_SECRET as string,
   scopes: requiredEnvVars.SHOPIFY_APP_SCOPES.split(','),
   hostName: requiredEnvVars.HOST.replace(/https?:\/\//, ''),
   apiVersion: LATEST_API_VERSION,
@@ -45,7 +45,7 @@ export const shopify = shopifyApi({
   },
   isPrivateApp: false,
   sessionStorage: {
-    async storeSession(session) {
+    async storeSession(session: Session) {
       console.log('Storing session:', {
         shop: session.shop,
         scope: session.scope,
@@ -53,7 +53,7 @@ export const shopify = shopifyApi({
       });
       tokenStore[session.shop] = session.accessToken;
     },
-    async loadSession(id) {
+    async loadSession(id: string) {
       console.log('Loading session:', id);
       const token = tokenStore[id];
       if (!token) return undefined;
@@ -62,9 +62,9 @@ export const shopify = shopifyApi({
         accessToken: token,
         scope: requiredEnvVars.SHOPIFY_APP_SCOPES,
         isOnline: false,
-      };
+      } as Session;
     },
-    async deleteSession(id) {
+    async deleteSession(id: string) {
       console.log('Deleting session:', id);
       delete tokenStore[id];
     },
