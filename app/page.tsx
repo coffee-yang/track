@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import LoginForm from '@/components/LoginForm';
 
 export default function Home() {
   const router = useRouter();
@@ -60,40 +61,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          Welcome to Cheerful Track
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          Shopify Track App
         </h1>
-        <p className="text-gray-600 text-center mb-8">
-          Please enter your Shopify store domain to continue
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="shop" className="block text-sm font-medium text-gray-700 mb-1">
-              Shop Domain
-            </label>
-            <input
-              type="text"
-              id="shop"
-              value={shop}
-              onChange={(e) => setShop(e.target.value)}
-              placeholder="your-store.myshopify.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
-          )}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Continue
-          </button>
-        </form>
+        <Suspense fallback={<div>Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
-    </div>
+    </main>
   );
 }
