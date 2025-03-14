@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const authUrl = await shopify.auth.begin({
       shop,
       callbackPath: '/api/auth/callback',
-      isOnline: true, // 使用在线访问模式
+      isOnline: false, // 使用离线访问模式
       rawRequest: request
     });
 
@@ -29,6 +29,9 @@ export async function GET(request: Request) {
     return NextResponse.redirect(authUrl);
   } catch (error) {
     console.error('Auth error:', error);
+    if (error instanceof Error) {
+      return NextResponse.json({ error: `Authentication failed: ${error.message}` }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });
   }
 } 
