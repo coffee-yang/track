@@ -1,4 +1,5 @@
 import { shopifyApi, LATEST_API_VERSION, LogSeverity } from '@shopify/shopify-api';
+import '@shopify/shopify-api/adapters/node';
 
 // 检查必要的环境变量
 const requiredEnvVars = {
